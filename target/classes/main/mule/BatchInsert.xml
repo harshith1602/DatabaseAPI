@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="BatchInsertFlow" doc:id="e59ffcef-6862-4627-a4e8-75487b6f361f" >
+		<http:listener doc:name="Listener" doc:id="67e8267e-2e15-4a60-b874-d8902b5a2458" config-ref="HTTP_Listener_config" path="batch-insert"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9739fe7e-e24a-45c2-a958-2fb4a8b7906b" message="started the flow #[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="1674bd0d-71f5-416f-acec-fccb2844cf4a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	EMP_ID: payload01.EMP_ID,
+	EMP_NAME: payload01.EMP_NAME,
+	EMP_STATUS: payload01.EMP_STATUS,
+	EMP_JOINING: payload01.EMP_JOINING
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:bulk-insert doc:name="Bulk insert" doc:id="d9dcc8d7-7f21-4e77-b128-054d49b37c41" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO EMPLOYEE(EMP_ID,EMP_NAME,EMP_STATUS,EMP_JOINING) VALUES(:EMP_ID,:EMP_NAME,:EMP_STATUS,:EMP_JOINING)]]></db:sql>
+		</db:bulk-insert>
+		<ee:transform doc:name="Transform Message" doc:id="40a5345f-725e-4834-b343-6203656f332f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	status: 200,
+	message: "success"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

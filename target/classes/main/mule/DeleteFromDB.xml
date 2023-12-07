@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="DeleteFromDBFlow" doc:id="dfbf9d22-278f-4fcd-af8a-279043af3e41" >
+		<http:listener doc:name="Listener" doc:id="a73ad449-061a-41ee-b5c6-28ed7d203c15" config-ref="HTTP_Listener_config" path="delete-employee"/>
+		<logger level="INFO" doc:name="Logger" doc:id="06ee2955-1edd-4794-b40d-22a07a44abd0" message="The row to be deleted can be identified with #[payload]"/>
+		<db:delete doc:name="Delete" doc:id="1ec208a3-94ac-44a7-8f01-7b92ac4eedc9" config-ref="Database_Config">
+			<db:sql ><![CDATA[DELETE FROM EMPLOYEE WHERE EMP_ID=:EMP_ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"EMP_ID":payload.id
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="29b1a8a9-9864-4738-a348-10ded769a67f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status":200,
+	"message":"success",
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

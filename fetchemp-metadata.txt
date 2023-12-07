@@ -1,0 +1,9 @@
+{
+"EMP_ID":1,
+"EMP_NAME":"A",
+"EMP_STATUS":"B",
+"EMP_JOINING":"12/10/2023"
+}
+
+
+

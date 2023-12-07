@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="FetchAllFromDBFlow" doc:id="6db01421-8498-4422-ac20-46d32504311f" >
+		<http:listener doc:name="Listener" doc:id="e92ac624-1d97-438c-a453-93cf0efa92e0" config-ref="HTTP_Listener_config" path="fetch-all"/>
+		<db:select doc:name="Select" doc:id="673cff96-d92c-4803-aeb0-570fa668336c" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT EMP_ID,EMP_NAME,EMP_STATUS,EMP_JOINING FROM EMPLOYEE]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="caa75e11-3bf2-4183-829f-bd55b9cb9bbe" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map (payload01) -> {
+    EMP_ID: payload01.EMP_ID default 0,
+    EMP_NAME: payload01.EMP_NAME default "",
+    EMP_STATUS: payload01.EMP_STATUS default "",
+    EMP_JOINING: payload01.EMP_JOINING default ""
+}
+]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+	</flow>
+</mule>

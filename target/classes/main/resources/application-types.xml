@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="fetch" format="json">
+      <types:shape format="weave" example="examples/fetchSingleDetail-metadata.json"><![CDATA[%dw 2.0
+
+type fetch = {|
+  EMP_ID: Number {"typeId": "int"}, 
+  EMP_NAME: String, 
+  EMP_STATUS: String, 
+  EMP_JOINING: String
+|} {"example": "{\\\"EMP_ID\\\":1,\\\"EMP_NAME\\\":\\\"A\\\",\\\"EMP_STATUS\\\":\\\"B\\\",\\\"EMP_JOINING\\\":\\\"12\\/10\\/2023\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="mytype" format="json">
+      <types:shape format="weave" example="examples/fetchemp-metadata.json"><![CDATA[%dw 2.0
+
+type mytype = Array<{|  EMP_ID: Number {"typeId": "int"},   EMP_NAME: String,   EMP_STATUS: String,   EMP_JOINING: String|}> {"example": "[{\\\"EMP_ID\\\":1,\\\"EMP_NAME\\\":\\\"A\\\",\\\"EMP_STATUS\\\":\\\"B\\\",\\\"EMP_JOINING\\\":\\\"12\\/10\\/2023\\\"},{\\\"EMP_ID\\\":1,\\\"EMP_NAME\\\":\\\"A\\\",\\\"EMP_STATUS\\\":\\\"B\\\",\\\"EMP_JOINING\\\":\\\"12\\/10\\/2023\\\"},{\\\"EMP_ID\\\":1,\\\"EMP_NAME\\\":\\\"A\\\",\\\"EMP_STATUS\\\":\\\"B\\\",\\\"EMP_JOINING\\\":\\\"12\\/10\\/2023\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#caa75e11-3bf2-4183-829f-bd55b9cb9bbe">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="mytype"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#04a6a995-3ef6-42f4-9b90-2a655a4aabd0">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="fetch"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#1674bd0d-71f5-416f-acec-fccb2844cf4a">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="mytype"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="mytype"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
